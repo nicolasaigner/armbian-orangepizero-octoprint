@@ -12,7 +12,3 @@ Este projeto é um fork do [armbian/build](https://github.com/armbian/build). Pa
 4. Executa o script `compile.sh` com as configurações especificadas.
 5. Salva todos os logs de build em `build.log`.
 6. Quando o build estiver completo, procura a URL do log no `build.log` e abre no navegador padrão.
-
-<!--
-BOARD=orangepizero BRANCH=current BUILD_DESKTOP=no BUILD_MINIMAL=yes KERNEL_CONFIGURE=no RELEASE=focal SHARE_LOG=yes ./compile.sh | tee build.log
--->
