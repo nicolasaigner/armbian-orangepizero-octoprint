@@ -7,7 +7,7 @@ git clone https://github.com/armbian/build
 mkdir -p build/userpatches
 
 # Copie suas configurações customizadas para build/userpatches
-cp customize-image.sh build/userpatches
+cp armbian/customize-image.sh build/userpatches
 
 # Entre no diretório do projeto armbian/build
 cd build
