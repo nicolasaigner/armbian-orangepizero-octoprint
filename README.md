@@ -41,6 +41,14 @@ SHARE_LOG=yes
 
 9. Aguarde os logs, no fim você terá um link para acessar no terminal parecido com esse: 
 ```bash
-
+[🌿] Done building image [ orangepizero ]
+[🌱] Runtime [ 18:17 min ]
+[✨] Repeat Build Options [ ./compile.sh build BOARD=orangepizero BRANCH=current BUILD_DESKTOP=no BUILD_MINIMAL=yes DEST_LANG=pt_BR.UTF-8 KERNEL_CONFIGURE=no RELEASE=focal SHARE_LOG=yes ]
+[🌱] Cleaning up [ please wait for cleanups to finish ]
+[🌿] ANSI log file built; inspect it by running: [ less -RS output/logs/log-build-a9c1292c-1ff9-4608-ac59-f63d9a7b92cb.log.ans ]
+[🌱] SHARE_LOG=yes, uploading log [ uploading logs ]
+[🌿] Log uploaded, share URL: [ https://paste.next.armbian.com/neqikabiri ]
 ```
+
+Se você observar, demorou cerca de 20 minutos para executar esse script. Estou executando isso em um Hyper-V com Ubuntu 23.04 com 16 GB
 
