@@ -1,0 +1,101 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git dialog lsb-release binutils debootstrap
+
+      - name: Clone Armbian Build
+        run: git clone https://github.com/armbian/build.git
+
+      - name: Copy customize-image.sh
+        run: cp -r userpatches build/
+
+      - name: Set file permissions
+        run: |
+          chmod +x build/userpatches/customize-image.sh
+          chmod +x build/compile.sh
+
+      - name: Build Armbian image
+        run: |
+          cd build
+          ./compile.sh \
+            BOARD=orangepizero \
+            BRANCH=current \
+            BUILD_DESKTOP=no \
+            BUILD_MINIMAL=yes \
+            KERNEL_CONFIGURE=no \
+            RELEASE=focal \
+            DEST_LANG="pt_BR.UTF-8" \
+            SHARE_LOG=yes
+
+      - name: Upload Armbian image
+        uses: actions/upload-artifact@v2
+        with:
+          name: Armbian-Image
+          path: build/output/images/
+
+      - name: Get image name
+        id: get_image_name
+        run: |
+          echo "::set-output name=image_name::$(ls build/output/images/ | grep .img)"
+
+      - name: Bump version and push tag
+        id: create_tag
+        uses: mathieudutour/github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+
+  release:
+    needs: build_image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download Armbian image
+        uses: actions/download-artifact@v2
+        with:
+          name: Armbian-Image
+          path: build/output/images/
+
+      - name: Get image name
+        id: get_image_name
+        run: |
+          echo "::set-output name=image_name::$(ls build/output/images/ | grep .img)"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - Automated build of Armbian image for Orange Pi Zero
+            - ${{ steps.create_tag.outputs.changelog }}
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/output/images/${{ steps.get_image_name.outputs.image_name }}
+          asset_name: ${{ steps.get_image_name.outputs.image_name }}
+          asset_content_type: application/octet-stream
