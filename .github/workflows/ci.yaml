@@ -1,12 +1,13 @@
-name: Build Armbian Image
+name: CI
 
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
-  build:
+  build_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -52,25 +53,8 @@ jobs:
         run: |
           echo "::set-output name=image_name::$(ls build/output/images/ | grep .img)"
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump version and push tag
+        id: create_tag
+        uses: mathieudutour/github-tag-action@v5.6
         with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
-          body: |
-            Changes in this Release
-            - Automated build of Armbian image for Orange Pi Zero
-
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/output/images/${{ steps.get_image_name.outputs.image_name }}
-          asset_name: ${{ steps.get_image_name.outputs.image_name }}
-          asset_content_type: application/octet-stream
+          github_token: ${{ secrets.GITHUB_TOKEN }}
