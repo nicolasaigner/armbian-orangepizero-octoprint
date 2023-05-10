@@ -1,6 +1,10 @@
-# Armbian OctoPrint Build para Orange Pi Zero
+[![Build Armbian Image](https://github.com/nicolasaigner/armbian-orangepizero-octoprint/actions/workflows/main.yml/badge.svg)](https://github.com/nicolasaigner/armbian-orangepizero-octoprint/actions/workflows/main.yml)
 
-Este repositório contém uma customização específica para construir uma imagem Armbian para rodar o OctoPrint no Orange Pi Zero.
+------
+
+# Orange Pi Zero com Armbian Customizada
+
+Este repositório contém uma customização específica para construir uma imagem Armbian para rodar o OctoPrint no Orange Pi Zero e um script para gerar uma página web para configuração do WiFi (Access Point).
 
 ## Como usar
 
@@ -50,7 +54,7 @@ SHARE_LOG=yes
 [🌿] Log uploaded, share URL: [ https://paste.next.armbian.com/neqikabiri ]
 ```
 
-Se você observar, demorou cerca de 20 minutos para executar esse script. Estou executando isso em um Hyper-V com Ubuntu 23.04 com 16 GB
+Se você observar, demorou cerca de 20 minutos para executar esse script. Estou executando esse código em um Hyper-V com Ubuntu 23.04 com essas configurações:
 
 ```
 $ ./system-info.sh
