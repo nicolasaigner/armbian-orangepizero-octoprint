@@ -1,0 +1,48 @@
+name: Build Armbian Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git dialog lsb-release binutils debootstrap
+
+      - name: Clone Armbian Build
+        run: git clone https://github.com/armbian/build.git
+
+      - name: Copy customize-image.sh
+        run: cp -r userpatches build/
+
+      - name: Set file permissions
+        run: |
+          chmod +x build/userpatches/customize-image.sh
+          chmod +x build/compile.sh
+
+      - name: Build Armbian image
+        run: |
+          cd build
+          ./compile.sh \
+            BOARD=orangepizero \
+            BRANCH=current \
+            BUILD_DESKTOP=no \
+            BUILD_MINIMAL=yes \
+            KERNEL_CONFIGURE=no \
+            RELEASE=focal \
+            DEST_LANG="pt_BR.UTF-8" \
+            SHARE_LOG=yes
+
+      - name: Upload Armbian image
+        uses: actions/upload-artifact@v2
+        with:
+          name: Armbian-Image
+          path: build/output/images/
