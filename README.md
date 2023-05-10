@@ -52,3 +52,14 @@ SHARE_LOG=yes
 
 Se você observar, demorou cerca de 20 minutos para executar esse script. Estou executando isso em um Hyper-V com Ubuntu 23.04 com 16 GB
 
+```
+$ ./system-info.sh
+Specification        Value
+-------------        -----
+Operating System     Linux 6.2.0-20-generic GNU/Linux
+CPU Model            AMD Ryzen 7 5700G with Radeon Graphics
+CPU Cores            8
+Memory               15Gi
+Disk Space           74G
+GPU Info  
+```
