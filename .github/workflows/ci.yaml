@@ -57,4 +57,4 @@ jobs:
         id: create_tag
         uses: mathieudutour/github-tag-action@v5.6
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_TOKEN }}
