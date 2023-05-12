@@ -1,5 +1,11 @@
 name: CI/CD
 
+env:
+  BOARD: orangepizero
+  BRANCH: current
+  RELEASE: focal
+  LANG: pt_BR.UTF-8
+
 on:
   push:
     branches:
@@ -12,13 +18,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Cache apt packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/lockfile') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       - name: Setup dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y git dialog lsb-release binutils debootstrap
 
+      - name: Cache Armbian Build
+        uses: actions/cache@v2
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/lockfile') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Clone Armbian Build
-        run: git clone https://github.com/armbian/build.git
+        run: |
+          if [ ! -d "build" ]; then
+            git clone https://github.com/armbian/build.git
+          fi
 
       - name: Copy customize-image.sh
         run: cp -r userpatches build/
@@ -32,31 +58,19 @@ jobs:
         run: |
           cd build
           ./compile.sh \
-            BOARD=orangepizero \
-            BRANCH=current \
-            BUILD_DESKTOP=no \
-            BUILD_MINIMAL=yes \
-            KERNEL_CONFIGURE=no \
-            RELEASE=focal \
-            DEST_LANG="pt_BR.UTF-8" \
-            SHARE_LOG=yes
+          BOARD=$BOARD \
+          BRANCH=$BRANCH \
+          BUILD_DESKTOP=no \
+          BUILD_MINIMAL=yes \
+          KERNEL_CONFIGURE=no \
+          RELEASE=$RELEASE \
+          DEST_LANG=$LANG
 
       - name: Upload Armbian image
         uses: actions/upload-artifact@v2
         with:
           name: Armbian-Image
           path: build/output/images/
-
-      - name: Get image name
-        id: get_image_name
-        run: |
-          echo "::set-output name=image_name::$(ls build/output/images/ | grep .img)"
-
-      - name: Bump version and push tag
-        id: create_tag
-        uses: mathieudutour/github-tag-action@v5.6
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}
 
   release:
     needs: build_image
@@ -71,11 +85,6 @@ jobs:
           name: Armbian-Image
           path: build/output/images/
 
-      - name: Get image name
-        id: get_image_name
-        run: |
-          echo "::set-output name=image_name::$(ls build/output/images/ | grep .img)"
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -87,7 +96,6 @@ jobs:
           body: |
             Changes in this Release
             - Automated build of Armbian image for Orange Pi Zero
-            - ${{ steps.create_tag.outputs.changelog }}
 
       - name: Upload Release Asset
         id: upload-release-asset
