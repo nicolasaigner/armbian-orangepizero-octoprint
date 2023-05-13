@@ -85,6 +85,11 @@ jobs:
           name: Armbian-Image
           path: build/output/images/
 
+      - name: Create Tag
+        id: create_tag
+        run: |
+          echo ::set-output name=tag::v$(date +'%Y%m%d%H%M%S')
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -96,6 +101,11 @@ jobs:
           body: |
             Changes in this Release
             - Automated build of Armbian image for Orange Pi Zero
+
+      - name: Get Image Name
+        id: get_image_name
+        run: |
+          echo ::set-output name=image_name::$(ls build/output/images/)
 
       - name: Upload Release Asset
         id: upload-release-asset
