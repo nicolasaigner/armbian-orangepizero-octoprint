@@ -21,11 +21,9 @@ jobs:
       - name: Cache apt packages
         uses: actions/cache@v2
         with:
-          path: |
-            /var/cache/apt
+          path: /var/cache/apt
           key: ${{ runner.os }}-apt-${{ hashFiles('/var/lib/dpkg/status') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
+          restore-keys: ${{ runner.os }}-apt-
 
       - name: Setup dependencies
         run: |
@@ -37,8 +35,7 @@ jobs:
         with:
           path: build
           key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-build-
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Clone Armbian Build
         run: |
@@ -102,18 +99,8 @@ jobs:
             Changes in this Release
             - Automated build of Armbian image for Orange Pi Zero
 
-      - name: Get Image Name
-        id: get_image_name
-        run: |
-          echo ::set-output name=image_name::$(ls build/output/images/)
-
       - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        uses: AButler/upload-release-assets@v2.0.2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/output/images/${{ steps.get_image_name.outputs.image_name }}
-          asset_name: ${{ steps.get_image_name.outputs.image_name }}
-          asset_content_type: application/octet-stream
+          files: './build/output/images/*'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
