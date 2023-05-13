@@ -73,7 +73,7 @@ jobs:
           path: build/output/images/
 
   release:
-    needs: build_image
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
