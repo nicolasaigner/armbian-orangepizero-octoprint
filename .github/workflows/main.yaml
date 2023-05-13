@@ -12,7 +12,7 @@ on:
       - main
 
 jobs:
-  build_image:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -32,11 +32,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git dialog lsb-release binutils debootstrap
 
-      - name: Create non-root user
-        run: |
-          sudo useradd -m myuser
-          sudo chown -R myuser /home/runner/work
-
       - name: Cache Armbian Build
         uses: actions/cache@v2
         with:
@@ -48,21 +43,21 @@ jobs:
       - name: Clone Armbian Build
         run: |
           if [ ! -d "build" ]; then
-            sudo -u myuser git clone https://github.com/armbian/build.git
+            git clone https://github.com/armbian/build.git
           fi
 
       - name: Copy customize-image.sh
-        run: sudo -u myuser cp -r userpatches build/
+        run: cp -r userpatches build/
 
       - name: Set file permissions
         run: |
-          sudo chmod +x build/userpatches/customize-image.sh
-          sudo chmod +x build/compile.sh
+          chmod +x build/userpatches/customize-image.sh
+          chmod +x build/compile.sh
 
       - name: Build Armbian image
         run: |
           cd build
-          sudo -u myuser ./compile.sh \
+          ./compile.sh \
           BOARD=$BOARD \
           BRANCH=$BRANCH \
           BUILD_DESKTOP=no \
