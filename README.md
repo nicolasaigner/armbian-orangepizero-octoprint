@@ -1,4 +1,4 @@
-[![Build Armbian Image](https://github.com/nicolasaigner/armbian-orangepizero-octoprint/actions/workflows/main.yml/badge.svg)](https://github.com/nicolasaigner/armbian-orangepizero-octoprint/actions/workflows/main.yml)
+[![CI/CD](https://github.com/nicolasaigner/armbian-orangepizero-octoprint/actions/workflows/main.yaml/badge.svg)](https://github.com/nicolasaigner/armbian-orangepizero-octoprint/actions/workflows/main.yaml)
 
 ------
 
