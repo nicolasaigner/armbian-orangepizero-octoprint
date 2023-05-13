@@ -23,7 +23,7 @@ jobs:
         with:
           path: |
             /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/lockfile') }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('/var/lib/dpkg/status') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
@@ -32,32 +32,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git dialog lsb-release binutils debootstrap
 
+      - name: Create non-root user
+        run: |
+          sudo useradd -m myuser
+          sudo chown -R myuser /home/runner/work
+
       - name: Cache Armbian Build
         uses: actions/cache@v2
         with:
           path: build
-          key: ${{ runner.os }}-build-${{ hashFiles('**/lockfile') }}
+          key: ${{ runner.os }}-build-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-build-
 
       - name: Clone Armbian Build
         run: |
           if [ ! -d "build" ]; then
-            git clone https://github.com/armbian/build.git
+            sudo -u myuser git clone https://github.com/armbian/build.git
           fi
 
       - name: Copy customize-image.sh
-        run: cp -r userpatches build/
+        run: sudo -u myuser cp -r userpatches build/
 
       - name: Set file permissions
         run: |
-          chmod +x build/userpatches/customize-image.sh
-          chmod +x build/compile.sh
+          sudo chmod +x build/userpatches/customize-image.sh
+          sudo chmod +x build/compile.sh
 
       - name: Build Armbian image
         run: |
           cd build
-          ./compile.sh \
+          sudo -u myuser ./compile.sh \
           BOARD=$BOARD \
           BRANCH=$BRANCH \
           BUILD_DESKTOP=no \
